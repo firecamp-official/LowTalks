@@ -20,15 +20,6 @@
     </form>
   </div>
 
-  <!-- Supabase JS via CDN -->
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    
-    const supabaseUrl = 'https://TON-PROJET.supabase.co'; // <-- remplace par ton URL Supabase
-    const supabaseKey = 'CLE_PUBLIQUE_ANON';             // <-- remplace par ta clé anonyme
-    export const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    import('./script.js');
-  </script>
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
