@@ -1,4 +1,4 @@
-import { supabase } from 'supabase.js';
+import { supabase } from './supabase.js';
 
 const denied = document.querySelector('#access-denied');
 const chat = document.querySelector('#chat');
