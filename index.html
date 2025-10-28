@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5% Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="access-denied">
+    <h1>⚡ Accès refusé</h1>
+    <p>Tu dois être à <strong>5% de batterie ou moins</strong> pour rejoindre le 5% Club.</p>
+  </section>
+
+  <section id="chat">
+    <h1>Bienvenue dans le 5% Club 💀</h1>
+    <form id="chat-form">
+      <input type="text" id="user" placeholder="Ton pseudo" required>
+      <input type="text" id="message-input" placeholder="Ton message..." required>
+      <button type="submit">Envoyer</button>
+    </form>
+    <div id="messages"></div>
+  </section>
+
+  <script type="module" src="supabase.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
