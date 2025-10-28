@@ -11,20 +11,49 @@ const userInput = document.querySelector('#user');
 const MESSAGE_COOLDOWN = 5000;
 let lastMessageTime = 0;
 
-// 🔋 Détection du niveau de batterie
-navigator.getBattery().then(battery => {
-  function checkBattery() {
-    if (battery.level <= 0.05) {
-      denied.style.display = 'none';
-      chat.style.display = 'flex';
-    } else {
-      denied.style.display = 'flex';
-      chat.style.display = 'none';
+// ✅ Mode dev/test toggle
+function isDevMode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('dev') === '1') return true;
+  if (localStorage.getItem('devMode') === '1') return true;
+  return false;
+}
+
+// Activer le chat
+function enableChatUI() {
+  denied.style.display = 'none';
+  chat.style.display = 'flex';
+}
+
+// Désactiver le chat
+function disableChatUI() {
+  denied.style.display = 'flex';
+  chat.style.display = 'none';
+}
+
+// 🔋 Détection batterie avec fallback dev mode
+if (isDevMode()) {
+  console.info('[5% Club] Mode DEV activé — chat accessible quel que soit le niveau de batterie.');
+  enableChatUI();
+} else if ('getBattery' in navigator) {
+  navigator.getBattery().then(battery => {
+    function checkBattery() {
+      if (battery.level <= 0.05) {
+        enableChatUI();
+      } else {
+        disableChatUI();
+      }
     }
-  }
-  checkBattery();
-  battery.addEventListener('levelchange', checkBattery);
-});
+    checkBattery();
+    battery.addEventListener('levelchange', checkBattery);
+  }).catch(err => {
+    console.warn('[5% Club] API Battery non disponible ou erreur :', err);
+    disableChatUI();
+  });
+} else {
+  console.warn('[5% Club] navigator.getBattery() non supporté — chat désactivé par défaut.');
+  disableChatUI();
+}
 
 // 💬 Chargement des anciens messages
 async function loadMessages() {
@@ -32,7 +61,7 @@ async function loadMessages() {
     .from('messages')
     .select('*')
     .order('created_at', { ascending: true });
-    
+
   if (error) {
     console.error('Erreur chargement messages:', error);
     return;
@@ -44,9 +73,9 @@ async function loadMessages() {
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// 🚫 Sécurité basique : empêcher HTML ou script injection
-function escapeHTML(str) {
-  return str
+// 🚫 Sécurité : empêcher l’injection HTML
+function escapeHTML(str = '') {
+  return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -54,13 +83,12 @@ function escapeHTML(str) {
     .replace(/'/g, "&#039;");
 }
 
-// ✉️ Envoi d’un message (avec anti-spam)
+// ✉️ Envoi d’un message (anti-spam)
 async function sendMessage(e) {
   e.preventDefault();
 
   const user = userInput.value.trim();
   const text = input.value.trim();
-
   if (!user || !text) return;
 
   const now = Date.now();
@@ -77,21 +105,15 @@ async function sendMessage(e) {
   input.value = '';
 }
 
-// 🔁 Écoute en temps réel des nouveaux messages
+// 🔁 Écoute en temps réel
 supabase
   .channel('messages')
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'messages' },
-    payload => {
-      const m = payload.new;
-      messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
-      messagesList.scrollTop = messagesList.scrollHeight;
-    }
-  )
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+    const m = payload.new;
+    messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
+    messagesList.scrollTop = messagesList.scrollHeight;
+  })
   .subscribe();
 
 form.addEventListener('submit', sendMessage);
-
-// 🚀 Chargement initial
 loadMessages();
