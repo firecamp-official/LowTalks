@@ -1,56 +1,104 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #e5e5e5;
+  --accent: #00d1ff;
+  --accent-dim: #007b96;
+  --card: #141414;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #121212;
-  color: #eee;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #access-denied {
   text-align: center;
+  padding: 2em;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
 #chat {
   display: none;
   flex-direction: column;
   width: 90%;
-  max-width: 500px;
+  max-width: 480px;
+  height: 90vh;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 209, 255, 0.2);
+  overflow: hidden;
+}
+
+header {
+  background: var(--accent-dim);
+  color: white;
+  text-align: center;
+  padding: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #messages {
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 10px;
-  border: 1px solid #444;
-  padding: 10px;
-  height: 300px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+#messages p {
   background: #1e1e1e;
+  padding: 0.5em 1em;
+  border-radius: 10px;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+#messages b {
+  color: var(--accent);
 }
 
 #chat-form {
   display: flex;
-  gap: 5px;
+  padding: 1em;
+  background: #111;
+  gap: 0.5em;
 }
 
-#chat-form input[type="text"] {
+#chat-form input, #chat-form button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em;
+}
+
+#chat-form input {
   flex: 1;
-  padding: 5px;
-  border: 1px solid #444;
-  border-radius: 4px;
-  background: #222;
-  color: #fff;
+  background: #1c1c1c;
+  color: white;
 }
 
 #chat-form button {
-  padding: 5px 10px;
-  background: #0af;
-  border: none;
-  border-radius: 4px;
+  background: var(--accent);
   color: #000;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+#chat-form button:hover {
+  background: var(--accent-dim);
 }
