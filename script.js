@@ -14,10 +14,13 @@ let lastMessageTime = 0;
 // 🔋 Détection du niveau de batterie
 navigator.getBattery().then(battery => {
   function checkBattery() {
-  denied.style.display = 'none';
-  chat.style.display = 'flex';
-}
-
+    if (battery.level <= 0.05) {
+      denied.style.display = 'none';
+      chat.style.display = 'flex';
+    } else {
+      denied.style.display = 'flex';
+      chat.style.display = 'none';
+    }
   }
   checkBattery();
   battery.addEventListener('levelchange', checkBattery);
