@@ -33,7 +33,6 @@ function disableChatUI() {
 
 // 🔋 Détection batterie avec fallback dev mode
 if (isDevMode()) {
-  console.info('[5% Club] Mode DEV activé — chat accessible quel que soit le niveau de batterie.');
   enableChatUI();
 } else if ('getBattery' in navigator) {
   navigator.getBattery().then(battery => {
