@@ -7,6 +7,11 @@ const form = document.querySelector('#chat-form');
 const input = document.querySelector('#message-input');
 const userInput = document.querySelector('#user');
 
+// 🕒 Anti-spam : délai minimal entre deux messages (en ms)
+const MESSAGE_COOLDOWN = 5000;
+let lastMessageTime = 0;
+
+// 🔋 Détection du niveau de batterie
 navigator.getBattery().then(battery => {
   function checkBattery() {
     if (battery.level <= 0.05) {
@@ -21,33 +26,72 @@ navigator.getBattery().then(battery => {
   battery.addEventListener('levelchange', checkBattery);
 });
 
-// Charger anciens messages
+// 💬 Chargement des anciens messages
 async function loadMessages() {
-  const { data } = await supabase.from('messages').select('*').order('created_at', { ascending: true });
-  if (data) {
-    messagesList.innerHTML = data.map(m => `<p><b>${m.user}:</b> ${m.text}</p>`).join('');
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .order('created_at', { ascending: true });
+    
+  if (error) {
+    console.error('Erreur chargement messages:', error);
+    return;
   }
+
+  messagesList.innerHTML = data
+    .map(m => `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`)
+    .join('');
+  messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// Envoyer message
+// 🚫 Sécurité basique : empêcher HTML ou script injection
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ✉️ Envoi d’un message (avec anti-spam)
 async function sendMessage(e) {
   e.preventDefault();
+
   const user = userInput.value.trim();
   const text = input.value.trim();
+
   if (!user || !text) return;
 
-  await supabase.from('messages').insert([{ user, text }]);
+  const now = Date.now();
+  if (now - lastMessageTime < MESSAGE_COOLDOWN) {
+    alert("Hey, respire un peu ! Attends quelques secondes avant de renvoyer un message 😉");
+    return;
+  }
+
+  lastMessageTime = now;
+
+  const { error } = await supabase.from('messages').insert([{ username: user, text }]);
+  if (error) console.error('Erreur envoi message:', error);
+
   input.value = '';
 }
 
-// Réception en temps réel
-supabase.channel('messages')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-    const m = payload.new;
-    messagesList.innerHTML += `<p><b>${m.user}:</b> ${m.text}</p>`;
-    messagesList.scrollTop = messagesList.scrollHeight;
-  })
+// 🔁 Écoute en temps réel des nouveaux messages
+supabase
+  .channel('messages')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'messages' },
+    payload => {
+      const m = payload.new;
+      messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+  )
   .subscribe();
 
 form.addEventListener('submit', sendMessage);
+
+// 🚀 Chargement initial
 loadMessages();
