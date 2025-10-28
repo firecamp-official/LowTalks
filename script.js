@@ -61,9 +61,6 @@ function escapeHTML(str = '') {
     .replace(/'/g, "&#039;");
 }
 
-/* ---------------------------
- 💬 Chargement des messages
---------------------------- */
 async function loadMessages() {
   const { data, error } = await supabase
     .from('messages')
@@ -71,42 +68,41 @@ async function loadMessages() {
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('❌ Erreur chargement messages :', error);
+    console.error('Erreur chargement messages:', error);
     return;
   }
 
   messagesList.innerHTML = data
-    .map(m => `<p><b>${escapeHTML(m.username)}</b> : ${escapeHTML(m.text)}</p>`)
+    .map(m => `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`)
     .join('');
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-/* ---------------------------
- 📩 Envoi d’un message
---------------------------- */
 async function sendMessage(e) {
   e.preventDefault();
-
   const user = userInput.value.trim();
   const text = input.value.trim();
   if (!user || !text) return;
 
   const now = Date.now();
   if (now - lastMessageTime < MESSAGE_COOLDOWN) {
-    showToast("⏳ Patiente un peu avant de renvoyer un message !");
+    alert("Attends quelques secondes avant de renvoyer un message 😉");
     return;
   }
   lastMessageTime = now;
 
   const { error } = await supabase.from('messages').insert([{ username: user, text }]);
   if (error) {
-    console.error('❌ Erreur envoi message :', error);
-    showToast("Erreur d’envoi du message 😢");
+    console.error('Erreur envoi message:', error);
     return;
   }
 
   input.value = '';
+
+  // 🔄 “Refresh” automatique des messages après l’envoi
+  await loadMessages();
 }
+
 
 /* ---------------------------
  🔔 Abonnement temps réel
