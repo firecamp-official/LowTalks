@@ -7,11 +7,11 @@ const form = document.querySelector('#chat-form');
 const input = document.querySelector('#message-input');
 const userInput = document.querySelector('#user');
 
-// 🕒 Anti-spam : délai minimal entre deux messages (en ms)
+//  Anti-spam : délai minimal entre deux messages (en ms)
 const MESSAGE_COOLDOWN = 5000;
 let lastMessageTime = 0;
 
-// ✅ Mode dev/test toggle
+//  Mode dev/test toggle
 function isDevMode() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('dev') === '1') return true;
@@ -31,7 +31,7 @@ function disableChatUI() {
   chat.style.display = 'none';
 }
 
-// 🔋 Détection batterie avec fallback dev mode
+//  Détection batterie avec fallback dev mode
 if (isDevMode()) {
   enableChatUI();
 } else if ('getBattery' in navigator) {
@@ -54,7 +54,7 @@ if (isDevMode()) {
   disableChatUI();
 }
 
-// 💬 Chargement des anciens messages
+// Chargement des anciens messages
 async function loadMessages() {
   const { data, error } = await supabase
     .from('messages')
@@ -72,7 +72,7 @@ async function loadMessages() {
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// 🚫 Sécurité : empêcher l’injection HTML
+//  Sécurité : empêcher l’injection HTML
 function escapeHTML(str = '') {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -82,7 +82,7 @@ function escapeHTML(str = '') {
     .replace(/'/g, "&#039;");
 }
 
-// ✉️ Envoi d’un message (anti-spam)
+//  Envoi d’un message (anti-spam)
 async function sendMessage(e) {
   e.preventDefault();
 
@@ -104,7 +104,7 @@ async function sendMessage(e) {
   input.value = '';
 }
 
-// 🔁 Écoute en temps réel
+//  Écoute en temps réel
 supabase
   .channel('messages')
   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
