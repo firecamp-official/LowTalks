@@ -7,29 +7,26 @@ const form = document.querySelector('#chat-form');
 const input = document.querySelector('#message-input');
 const userInput = document.querySelector('#user');
 
-// Anti-spam
 const MESSAGE_COOLDOWN = 5000;
 let lastMessageTime = 0;
 
 // Mode dev/test
 function isDevMode() {
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('dev') === '1') return true;
-  if (localStorage.getItem('devMode') === '1') return true;
-  return false;
+  return urlParams.get('dev') === '1' || localStorage.getItem('devMode') === '1';
 }
 
+// Afficher ou cacher le chat
 function enableChatUI() {
   denied.style.display = 'none';
   chat.style.display = 'flex';
 }
-
 function disableChatUI() {
   denied.style.display = 'flex';
   chat.style.display = 'none';
 }
 
-// Batterie / fallback dev
+// Activer chat selon batterie ou mode dev
 if (isDevMode()) {
   enableChatUI();
 } else if ('getBattery' in navigator) {
@@ -48,7 +45,17 @@ if (isDevMode()) {
   disableChatUI();
 }
 
-// Chargement messages
+// Escape HTML pour éviter injections
+function escapeHTML(str='') {
+  return String(str)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+// Charger l'historique des messages
 async function loadMessages() {
   const { data, error } = await supabase
     .from('messages')
@@ -66,17 +73,7 @@ async function loadMessages() {
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// Escape HTML
-function escapeHTML(str='') {
-  return String(str)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-// Envoi message
+// Envoi d’un message avec anti-spam
 async function sendMessage(e) {
   e.preventDefault();
   const user = userInput.value.trim();
@@ -95,18 +92,23 @@ async function sendMessage(e) {
   input.value = '';
 }
 
-// Realtime
-const messageChannel = supabase.channel('messages')
-  .on(
-    'postgres_changes', 
-    { event: 'INSERT', schema: 'public', table: 'messages' }, 
-    payload => {
-      const m = payload.new;
-      messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
-      messagesList.scrollTop = messagesList.scrollHeight;
-    }
-  )
-  .subscribe();
+// Temps réel
+function subscribeRealtime() {
+  supabase.channel('messages')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
+      payload => {
+        const m = payload.new;
+        const atBottom = messagesList.scrollTop + messagesList.clientHeight >= messagesList.scrollHeight - 20;
+        messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
+        if (atBottom) messagesList.scrollTop = messagesList.scrollHeight;
+      }
+    )
+    .subscribe();
+}
 
+// Initialisation
 form.addEventListener('submit', sendMessage);
 loadMessages();
+subscribeRealtime();
