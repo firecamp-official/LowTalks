@@ -2,21 +2,28 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>5% Club Chat</title>
+  <title>⚡ 5% Club Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="access-denied">
     <h2>🔋 Le chat n'est accessible que lorsque votre batterie est ≤ 5%</h2>
-    <p>Pour les tests, tu peux activer le mode dev en ajoutant <code>?dev=1</code> à l'URL.</p>
+    <p>Pour les tests, active le mode dev avec <code>?dev=1</code> dans l’URL.</p>
   </div>
 
   <div id="chat">
+    <header>
+      <h1>⚡ 5% Club</h1>
+      <span id="user-count">👥 0 connecté(s)</span>
+    </header>
+
     <div id="messages"></div>
+
     <form id="chat-form">
       <input type="text" id="user" placeholder="Nom" required>
-      <input type="text" id="message-input" placeholder="Message" required>
-      <button type="submit">Envoyer</button>
+      <input type="text" id="message-input" placeholder="Message..." required>
+      <button type="submit">Envoyer ⚡</button>
     </form>
   </div>
 
