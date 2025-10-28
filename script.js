@@ -88,9 +88,15 @@ async function sendMessage(e) {
   lastMessageTime = now;
 
   const { error } = await supabase.from('messages').insert([{ username: user, text }]);
-  if (error) console.error('Erreur envoi message:', error);
-  input.value = '';
+  if (error) {
+    console.error('Erreur envoi message:', error);
+    return;
+  }
+
+  // 🔄 Refresh automatique après l'envoi
+  location.reload();
 }
+
 
 // Temps réel
 function subscribeRealtime() {
