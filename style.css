@@ -1,0 +1,31 @@
+body {
+  font-family: sans-serif;
+  background: #111;
+  color: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+#access-denied, #chat {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+}
+
+form {
+  margin-bottom: 1em;
+}
+
+#messages {
+  border: 1px solid #444;
+  padding: 10px;
+  width: 100%;
+  height: 300px;
+  overflow-y: auto;
+}
