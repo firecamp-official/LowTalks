@@ -96,12 +96,17 @@ async function sendMessage(e) {
 }
 
 // Realtime
-supabase.channel('messages')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-    const m = payload.new;
-    messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
-    messagesList.scrollTop = messagesList.scrollHeight;
-  }).subscribe();
+const messageChannel = supabase.channel('messages')
+  .on(
+    'postgres_changes', 
+    { event: 'INSERT', schema: 'public', table: 'messages' }, 
+    payload => {
+      const m = payload.new;
+      messagesList.innerHTML += `<p><b>${escapeHTML(m.username)}:</b> ${escapeHTML(m.text)}</p>`;
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+  )
+  .subscribe();
 
 form.addEventListener('submit', sendMessage);
 loadMessages();
