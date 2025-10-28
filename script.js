@@ -55,7 +55,6 @@ function escapeHTML(str='') {
     .replace(/'/g,"&#039;");
 }
 
-// Charger l'historique des messages
 async function loadMessages() {
   const { data, error } = await supabase
     .from('messages')
@@ -73,7 +72,6 @@ async function loadMessages() {
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// Envoi d’un message avec anti-spam
 async function sendMessage(e) {
   e.preventDefault();
   const user = userInput.value.trim();
@@ -93,10 +91,11 @@ async function sendMessage(e) {
     return;
   }
 
-  // 🔄 Refresh automatique après l'envoi
-  location.reload();
-}
+  input.value = '';
 
+  // 🔄 “Refresh” automatique des messages après l’envoi
+  await loadMessages();
+}
 
 // Temps réel
 function subscribeRealtime() {
