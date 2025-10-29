@@ -58,7 +58,4 @@ body[data-theme="dark"] {
   50% { text-shadow: -1px 1px var(--accent), 1px -1px var(--accent); }
 }
 
-.logo {
-  width: 100px;
-  height: auto;
-}
+
