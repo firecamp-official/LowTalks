@@ -2,31 +2,33 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>⚡ 5% Club Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Page quand batterie trop haute -->
   <div id="access-denied">
-    <h2>🔋 Le chat n'est accessible que lorsque votre batterie est ≤ 5%</h2>
-    <p>Pour les tests, active le mode dev avec <code>?dev=1</code> dans l’URL.</p>
+    <div class="glitch-logo">⚡</div>
+    <h2>🔋 Le chat est accessible uniquement si batterie ≤5%</h2>
+    <p>Pour tester, active le mode dev avec <code>?dev=1</code></p>
   </div>
 
+  <!-- Chat -->
   <div id="chat">
     <header>
       <h1>⚡ 5% Club</h1>
       <span id="user-count">👥 0 connecté(s)</span>
+      <button id="theme-toggle">🌓</button>
     </header>
-
     <div id="messages"></div>
-
     <form id="chat-form">
-      <input type="text" id="user" placeholder="Nom" required>
-      <input type="text" id="message-input" placeholder="Message..." required>
+      <input type="text" id="user" placeholder="Ton pseudo" required>
+      <input type="text" id="message-input" placeholder="Tape ton message..." required>
       <button type="submit">Envoyer ⚡</button>
     </form>
   </div>
 
-  <script type="module" src="./script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
